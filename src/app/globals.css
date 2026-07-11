@@ -2,10 +2,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-bg: #17351D;
-  --color-brand-bg-secondary: #1D3A22;
-  --color-brand-bg-alt: #19351E;
-  --color-brand-card: #18341D;
+  --color-brand-bg: #0F3035;
+  --color-brand-bg-secondary: #154147;
+  --color-brand-bg-alt: #11363C;
+  --color-brand-card: #123A40;
   
   --color-brand-text: #F7F3EC;
   --color-brand-text-secondary: #C9C5BB;

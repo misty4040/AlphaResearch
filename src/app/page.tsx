@@ -10,7 +10,7 @@ import { Footer } from "@/components/layout/Footer";
 
 const FADE_UP = {
   hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" as any } }
 };
 
 export default function Home() {
@@ -43,7 +43,7 @@ export default function Home() {
               </p>
             </motion.div>
 
-            <motion.div initial="hidden" animate="visible" variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, delay: 0.2, ease: "easeOut" } } }}>
+            <motion.div initial="hidden" animate="visible" variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, delay: 0.2, ease: "easeOut" as any } } }}>
               <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12">
                 <div className="flex items-center bg-brand-input-bg border border-brand-input-border rounded-[14px] overflow-hidden p-3 transition-colors focus-within:border-brand-gold/50">
                   <Search className="w-5 h-5 text-brand-gold ml-4 shrink-0" />
@@ -93,7 +93,7 @@ export default function Home() {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-100px" }}
-                  variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, delay: i * 0.1, ease: "easeOut" } } }}
+                  variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, delay: i * 0.1, ease: "easeOut" as any } } }}
                   className="bg-brand-card border border-brand-border-secondary rounded-[10px] p-[40px] transition-colors hover:border-brand-border"
                 >
                   <feature.icon className="w-6 h-6 text-brand-gold mb-8 stroke-[1.5px]" />
@@ -128,7 +128,7 @@ export default function Home() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
-                variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, delay: i * 0.1, ease: "easeOut" } } }}
+                variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, delay: i * 0.1, ease: "easeOut" as any } } }}
                 className="relative"
               >
                 <div className="font-serif text-[72px] text-brand-gold/30 mb-6 leading-none">
@@ -165,7 +165,7 @@ export default function Home() {
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  transition={{ duration: 0.8, ease: "easeOut" as any }}
                   className="bg-[#122A17] border border-brand-border-secondary p-[40px] rounded-[10px] shadow-2xl relative z-10"
                 >
                   <div className="border-b border-brand-divider pb-6 mb-6">

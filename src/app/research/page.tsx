@@ -9,6 +9,21 @@ import { Footer } from "@/components/layout/Footer";
 import { useSearchParams } from "next/navigation";
 import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip } from "recharts";
 
+const formatCurrency = (value: number | undefined, currency: string | undefined = "USD") => {
+  if (value === undefined || value === null) return "---";
+  try {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
+  } catch (e) {
+    const symbol = currency === 'INR' ? '₹' : (currency === 'EUR' ? '€' : (currency === 'GBP' ? '£' : '$'));
+    return `${symbol}${value.toFixed(2)}`;
+  }
+};
+
 export default function Page() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-brand-bg text-brand-text flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-brand-gold" /></div>}>
@@ -120,9 +135,9 @@ function ResearchPage() {
     const opt = {
       margin:       0.5,
       filename:     `${companyName || 'AlphaResearch'}_Investment_Report.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
+      image:        { type: 'jpeg' as const, quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true, logging: false },
-      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      jsPDF:        { unit: 'in' as const, format: 'letter' as const, orientation: 'portrait' as const }
     };
     
     html2pdf().set(opt).from(element).save();
@@ -311,7 +326,7 @@ function ResearchPage() {
                   {financials && (
                     <div className="flex justify-between items-end mb-8">
                        <h3 className="font-serif text-[34px] font-normal text-brand-text">{financials.symbol}</h3>
-                       <div className="text-[34px] font-sans font-medium">${financials?.currentPrice?.toFixed(2) || "---"}</div>
+                       <div className="text-[34px] font-sans font-medium">{formatCurrency(financials?.currentPrice, financials?.currency)}</div>
                     </div>
                   )}
 
@@ -337,11 +352,11 @@ function ResearchPage() {
                         <div className="text-brand-gold text-[12px] uppercase tracking-[2px] font-medium mb-2 col-span-1 sm:col-span-2">Market Financial Snapshot</div>
                         <div className="bg-brand-bg-alt p-6 rounded-[8px] border border-brand-border-secondary">
                           <div className="text-[12px] uppercase tracking-[2px] font-medium text-brand-muted mb-2">Current Price</div>
-                          <div className="text-[24px] font-medium">${financials?.currentPrice?.toFixed(2) || "---"}</div>
+                          <div className="text-[24px] font-medium">{formatCurrency(financials?.currentPrice, financials?.currency)}</div>
                         </div>
                         <div className="bg-brand-bg-alt p-6 rounded-[8px] border border-brand-border-secondary">
                           <div className="text-[12px] uppercase tracking-[2px] font-medium text-brand-muted mb-2">Previous Close</div>
-                          <div className="text-[24px] font-medium">${financials?.previousClose?.toFixed(2) || "---"}</div>
+                          <div className="text-[24px] font-medium">{formatCurrency(financials?.previousClose, financials?.currency)}</div>
                         </div>
                         <div className="bg-brand-bg-alt p-6 rounded-[8px] border border-brand-border-secondary">
                           <div className="text-[12px] uppercase tracking-[2px] font-medium text-brand-muted mb-2">1-Month Return</div>
@@ -351,7 +366,9 @@ function ResearchPage() {
                         </div>
                         <div className="bg-brand-bg-alt p-6 rounded-[8px] border border-brand-border-secondary">
                           <div className="text-[12px] uppercase tracking-[2px] font-medium text-brand-muted mb-2">52-Week Range</div>
-                          <div className="text-[24px] font-medium text-brand-text-secondary">{financials?.fiftyTwoWeekLow?.toFixed(2) || 'N/A'} - {financials?.fiftyTwoWeekHigh?.toFixed(2) || 'N/A'}</div>
+                          <div className="text-[24px] font-medium text-brand-text-secondary">
+                            {formatCurrency(financials?.fiftyTwoWeekLow, financials?.currency)} - {formatCurrency(financials?.fiftyTwoWeekHigh, financials?.currency)}
+                          </div>
                         </div>
                       </div>
                     )}

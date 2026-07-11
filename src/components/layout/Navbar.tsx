@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { BrainCircuit, Menu } from "lucide-react";
 import { motion } from "framer-motion";
@@ -17,7 +19,6 @@ export function Navbar() {
         <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-10 text-[17px] font-normal text-brand-text-secondary">
           <Link href="/" className="hover:text-brand-gold transition-colors">Home</Link>
           <Link href="/#features" className="hover:text-brand-gold transition-colors">Platform</Link>
-          <Link href="/pricing" className="hover:text-brand-gold transition-colors">Pricing</Link>
           <Link href="/about" className="hover:text-brand-gold transition-colors">About</Link>
         </div>
 

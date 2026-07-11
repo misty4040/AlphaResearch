@@ -63,7 +63,7 @@ class FallbackChatModel {
         }
       }
     }
-    
+
     if (this.openaiModel) {
       try {
         console.log("Using OpenAI Fallback");
@@ -105,7 +105,7 @@ class FallbackChatModel {
         }
       }
     }
-    
+
     if (this.openaiModel) {
       try {
         console.log("Using OpenAI Fallback (streaming)");
@@ -179,7 +179,7 @@ function getModel() {
 
 export async function findTickerNode(state: typeof AgentState.State) {
   const { companyName } = state;
-  
+
   const cleanName = companyName.trim().toUpperCase();
   if (cleanName === "LTM" || cleanName === "LTM.NSE") {
     return { ticker: "LT.NS", logs: [`Manual override: Resolved LTM query to LT.NS`] };
@@ -194,7 +194,7 @@ Rules:
 - If the company is primarily listed in India (e.g. Reliance, Tata, TARC, Adani, Zomato, etc.), you MUST append the ".NS" suffix to the ticker symbol (e.g. RELIANCE.NS, TCS.NS, TARC.NS, ZOMATO.NS).
 - If it is a US stock (e.g. Apple, Google, Microsoft), return the standard US ticker without any suffix (e.g. AAPL, GOOG, MSFT).
 - Return ONLY the ticker symbol, with no other text, markdown, or punctuation. If you cannot identify the ticker, reply with "UNKNOWN".`;
-    
+
     const response = await model.invoke(prompt);
     const ticker = response.content.toString().trim().toUpperCase().replace(/[^A-Z0-9.&-]/g, '');
     return { ticker, logs: [`Resolved ticker for "${companyName}": ${ticker}`] };
@@ -212,28 +212,43 @@ export async function fetchFinancialsNode(state: typeof AgentState.State) {
 
   try {
     const quote = await yahooFinance.quote(ticker);
-    
+
     // fetch 1 month data for the 1 month return calculation
     const queryOptions = { period1: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) };
     const chartData = await yahooFinance.chart(ticker, queryOptions);
     const quotes = chartData.quotes || [];
-    
+
     let oneMonthReturn = 0;
     if (quotes.length > 0) {
       const first = quotes[0].close;
       const last = quotes[quotes.length - 1].close;
-      oneMonthReturn = ((last - first) / first) * 100;
+      if (first != null && last != null) {
+        oneMonthReturn = ((last - first) / first) * 100;
+      }
+    }
+
+    let exchangeRate = 1;
+    if (quote.currency && quote.currency !== "INR") {
+      try {
+        const forexQuote = await yahooFinance.quote(`${quote.currency}INR=X`);
+        if (forexQuote && forexQuote.regularMarketPrice) {
+          exchangeRate = forexQuote.regularMarketPrice;
+        }
+      } catch (e) {
+        console.error("Forex error:", e);
+      }
     }
 
     const financials = {
       longName: quote.longName || quote.shortName || ticker,
       symbol: ticker,
-      currentPrice: quote.regularMarketPrice,
-      previousClose: quote.regularMarketPreviousClose,
-      fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh,
-      fiftyTwoWeekLow: quote.fiftyTwoWeekLow,
+      currentPrice: quote.regularMarketPrice ? quote.regularMarketPrice * exchangeRate : undefined,
+      previousClose: quote.regularMarketPreviousClose ? quote.regularMarketPreviousClose * exchangeRate : undefined,
+      fiftyTwoWeekHigh: quote.fiftyTwoWeekHigh ? quote.fiftyTwoWeekHigh * exchangeRate : undefined,
+      fiftyTwoWeekLow: quote.fiftyTwoWeekLow ? quote.fiftyTwoWeekLow * exchangeRate : undefined,
       volume: quote.regularMarketVolume,
-      currency: quote.currency,
+      currency: "INR",
+      exchangeRate: exchangeRate,
       exchange: quote.exchange || "NSE",
       oneMonthReturn: Number(oneMonthReturn.toFixed(2)),
     };
@@ -245,13 +260,13 @@ export async function fetchFinancialsNode(state: typeof AgentState.State) {
   }
 }
 
-async function safeHistorical(ticker: string, period1: Date, interval: '1d' | '1wk' | '1mo' = '1d') {
+async function safeHistorical(ticker: string, period1: Date, interval: '1d' | '1wk' | '1mo' = '1d', exchangeRate: number = 1) {
   try {
     const data = await yahooFinance.chart(ticker, { period1, interval });
     const quotes = data.quotes || [];
     return quotes.map((r: any) => ({
       date: r.date.toISOString().split('T')[0],
-      price: Number(r.close.toFixed(2))
+      price: Number((r.close * exchangeRate).toFixed(2))
     })).filter((pt: any) => pt.price !== null && pt.price !== undefined && !isNaN(pt.price));
   } catch (err) {
     console.error(`Error fetching historical for ${ticker}:`, err);
@@ -260,20 +275,20 @@ async function safeHistorical(ticker: string, period1: Date, interval: '1d' | '1
 }
 
 export async function fetchPriceHistoryNode(state: typeof AgentState.State) {
-  const { ticker } = state;
-  if (!ticker || ticker === "UNKNOWN") {
-    return { priceHistory: {}, logs: ["Skipping price history for unknown ticker."] };
-  }
+  const { ticker, financials } = state;
+  if (!ticker || ticker === "UNKNOWN") return { priceHistory: {}, logs: ["No valid ticker for price history."] };
+
+  const exchangeRate = financials?.exchangeRate || 1;
 
   try {
     const now = Date.now();
     const [h1w, h1m, h3m, h6m, h1y, h5y] = await Promise.all([
-      safeHistorical(ticker, new Date(now - 7 * 24 * 60 * 60 * 1000)),
-      safeHistorical(ticker, new Date(now - 30 * 24 * 60 * 60 * 1000)),
-      safeHistorical(ticker, new Date(now - 90 * 24 * 60 * 60 * 1000)),
-      safeHistorical(ticker, new Date(now - 180 * 24 * 60 * 60 * 1000)),
-      safeHistorical(ticker, new Date(now - 365 * 24 * 60 * 60 * 1000)),
-      safeHistorical(ticker, new Date(now - 5 * 365 * 24 * 60 * 60 * 1000), '1wk'),
+      safeHistorical(ticker, new Date(now - 7 * 24 * 60 * 60 * 1000), '1d', exchangeRate),
+      safeHistorical(ticker, new Date(now - 30 * 24 * 60 * 60 * 1000), '1d', exchangeRate),
+      safeHistorical(ticker, new Date(now - 90 * 24 * 60 * 60 * 1000), '1d', exchangeRate),
+      safeHistorical(ticker, new Date(now - 180 * 24 * 60 * 60 * 1000), '1d', exchangeRate),
+      safeHistorical(ticker, new Date(now - 365 * 24 * 60 * 60 * 1000), '1d', exchangeRate),
+      safeHistorical(ticker, new Date(now - 5 * 365 * 24 * 60 * 60 * 1000), '1wk', exchangeRate),
     ]);
 
     const priceHistory = {
@@ -299,7 +314,7 @@ export async function fetchNewsNode(state: typeof AgentState.State) {
   try {
     const searchQuery = `${companyName} ${ticker && ticker !== "UNKNOWN" ? ticker : ""} stock news investment`;
     const encoded = encodeURIComponent(searchQuery);
-    
+
     const res = await fetch(`https://news.google.com/rss/search?q=${encoded}&hl=en-US&gl=US&ceid=US:en`);
     if (!res.ok) {
       return { news: [], logs: ["Failed to fetch Google News RSS."] };
@@ -339,7 +354,7 @@ export async function fetchNewsNode(state: typeof AgentState.State) {
 export async function analyzeNode(state: typeof AgentState.State, config?: any) {
   const { companyName, ticker, financials, news } = state;
   const onToken = config?.configurable?.onToken;
-  
+
   const isTickerUnknown = !ticker || ticker === "UNKNOWN";
   const hasNoNews = !news || news.length === 0;
 
@@ -625,7 +640,7 @@ Analysis Report:
 ${analysis}`;
 
     const response = await model.invoke(prompt);
-    
+
     let cleanContent = response.content.toString().trim();
     if (cleanContent.startsWith("\`\`\`json")) {
       cleanContent = cleanContent.substring(7);
