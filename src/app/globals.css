@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-bg: #17351D;
+  --color-brand-bg-secondary: #1D3A22;
+  --color-brand-bg-alt: #19351E;
+  --color-brand-card: #18341D;
+  
+  --color-brand-text: #F7F3EC;
+  --color-brand-text-secondary: #C9C5BB;
+  --color-brand-muted: #9E9A90;
+  
+  --color-brand-gold: #D5A93A;
+  --color-brand-gold-hover: #E2B84C;
+  
+  --color-brand-success: #4FAE64;
+  --color-brand-warning: #D5A93A;
+  --color-brand-danger: #C85A54;
+  
+  --color-brand-border: rgba(213, 169, 58, 0.18);
+  --color-brand-border-secondary: rgba(255, 255, 255, 0.08);
+  --color-brand-divider: rgba(255, 255, 255, 0.06);
+  
+  --color-brand-button-bg: #F7F3EC;
+  --color-brand-button-text: #17351D;
+  
+  --color-brand-input-bg: rgba(255, 255, 255, 0.04);
+  --color-brand-input-border: rgba(255, 255, 255, 0.08);
+
+  --font-sans: var(--font-inter);
+  --font-serif: "Cormorant Garamond", serif;
+}
+
+body {
+  background-color: var(--color-brand-bg);
+  color: var(--color-brand-text);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background-color: rgba(213, 169, 58, 0.3);
+}
+
+/* Base styles for smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Markdown prose styles for research page */
+.prose {
+  color: var(--color-brand-text-secondary);
+}
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  color: var(--color-brand-text);
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+.prose strong {
+  color: var(--color-brand-text);
+  font-weight: 500;
+}
+.prose hr {
+  border-color: var(--color-brand-divider);
+}
+
+/* Recharts customization */
+.recharts-default-tooltip {
+  background-color: var(--color-brand-card) !important;
+  border: 1px solid var(--color-brand-border-secondary) !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+}
+.recharts-tooltip-item {
+  color: var(--color-brand-text) !important;
+}
