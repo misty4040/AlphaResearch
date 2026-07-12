@@ -4,46 +4,66 @@ An autonomous AI investment research agent that continuously aggregates market d
 
 ## Live Demo
 
-[View Live Demo on Vercel](https://alpharesearch.vercel.app/)
+[View Live Demo on Vercel](https://alpha-research-opal.vercel.app)
 
 ## Features
 
-- **Autonomous Agentic Workflow**: Uses LangGraph to orchestrate complex data aggregation and analysis.
-- **Real-Time Data Streaming**: Streams the AI's institutional memo directly to the frontend using Server-Sent Events (SSE).
-- **Institutional-Grade Formatting**: Enforces strict markdown guidelines for research reports without hallucinating financial metrics.
-- **Multi-Modal Data Ingestion**: Synthesizes structured data (Yahoo Finance metrics) and unstructured data (Google News RSS).
-- **Deterministic Sentiment Analysis**: Pre-computes news sentiment natively using AFINN lexicons to eliminate LLM sentiment hallucinations.
-- **Fallback AI Redundancy**: Seamlessly falls back across Google Gemini, OpenAI, and Hugging Face (Qwen 2.5) if rate limits or API errors occur.
+- **Autonomous Agentic Workflow**: Uses LangGraph to orchestrate a multi-step investment research pipeline, including ticker resolution, financial data retrieval, news aggregation, analysis, and investment decision-making.
+- **Real-Time Data Streaming**: Streams AI-generated investment research reports to the frontend using Server-Sent Events (SSE) for a smooth, responsive user experience.
+- **Institutional-Grade Research Reports**: Generates structured investment research reports grounded in retrieved financial data and recent news while maintaining a consistent institutional-style format.
+- **Multi-Source Data Aggregation**: Combines structured financial data from Yahoo Finance with the latest Google News RSS articles to deliver comprehensive market insights.
+- **Deterministic Sentiment Analysis**: Performs native sentiment analysis using AFINN lexicons before LLM inference, reducing sentiment inconsistencies and improving report quality.
+- **Resilient Multi-LLM Fallback**: Automatically switches between Google Gemini, OpenAI, and Hugging Face models to ensure uninterrupted report generation during rate limits or API failures.
+- **Interactive Stock Visualization**: Displays recent stock price trends using interactive charts for quick visual analysis of market performance.
+- **Investment Decision Engine**: Produces a binary **INVEST** or **PASS** recommendation with a confidence score, supporting rationale, and key investment highlights.
+- **PDF Report Export**: Generates and downloads a professionally formatted PDF version of the investment research report for offline viewing and sharing.
+- **Production-Ready Deployment**: Fully deployed on Vercel, providing fast, scalable, and reliable access to institutional-grade research.
 
 ## Tech Stack
 
+- **Language**: TypeScript
 - **Frontend**: Next.js 15, React 19, Tailwind CSS v4, Framer Motion, Recharts
 - **Backend**: Next.js App Router (API Routes)
-- **AI Framework**: LangGraph, LangChain
+- **AI Framework**: LangGraph.js, LangChain.js
 - **LLM Providers**: Google Gemini (gemini-2.5-flash), OpenAI, Hugging Face
 - **External APIs**: Yahoo Finance API (yahoo-finance2), Google News RSS
 
 ## Overview
 
-AlphaResearch is a specialized agentic workflow designed to replicate the analytical rigor of a CFA-level Senior Equity Research Analyst. By strictly controlling the context window and leveraging deterministic data pipelines, the agent prevents hallucinations and enforces institutional neutrality while producing actionable insights.
+AlphaResearch is an autonomous AI-powered investment research agent designed to replicate the analytical rigor of an institutional equity research analyst. It combines structured financial data, real-time market news, deterministic sentiment analysis, and LLM-powered reasoning to generate comprehensive investment research reports and binary **INVEST** or **PASS** recommendations.
+
+By grounding the analysis in retrieved financial data, recent news, and deterministic data pipelines, the agent reduces hallucinations, improves factual consistency, and delivers transparent, evidence-based investment insights while maintaining an institutional-style reporting format.
 
 ## Architecture
 
 User
-↓
-Ticker Resolution
-↓
-Yahoo Finance
-↓
-Google News
-↓
-LangGraph
-↓
-LLM Analysis
-↓
+   │
+   ▼
+Ticker Resolver
+   │
+   ▼
+Yahoo Finance ─────────► Financial Data
+   │
+Google News RSS ───────► News Articles
+   │
+   ▼
+Sentiment Analysis
+   │
+   ▼
+LangGraph Workflow
+   │
+   ▼
+Gemini
+   │
+(OpenAI Fallback)
+   │
+(Hugging Face Fallback)
+   │
+   ▼
 Investment Decision
-↓
-Interactive Report
+   │
+   ▼
+Interactive Dashboard
 
 ## How to Run
 
@@ -51,7 +71,7 @@ Interactive Report
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/AlphaResearch.git
+git clone https://github.com/misty4040/AlphaResearch.git
 cd AlphaResearch
 ```
 
@@ -100,11 +120,47 @@ TAVILY_API_KEY=your_tavily_api_key
 
 ## Example Runs
 
-The system works universally for global equities. Examples:
-- **Apple (AAPL)**
-- **NVIDIA (NVDA)**
-- **Tesla (TSLA)**
-- **Reliance Industries (RELIANCE.NS)**
+### Apple (AAPL)
+
+- **Recommendation:** INVEST
+- **Confidence:** 8/10
+- **Highlights:**
+  - Strong financial performance
+  - Continued Services growth
+  - Positive AI strategy
+
+---
+
+### NVIDIA (NVDA)
+
+- **Recommendation:** INVEST
+- **Confidence:** 9/10
+- **Highlights:**
+  - AI infrastructure leader
+  - Exceptional revenue growth
+  - Strong enterprise demand
+
+---
+
+### Tesla (TSLA)
+
+- **Recommendation:** PASS
+- **Confidence:** 6/10
+- **Highlights:**
+  - High valuation
+  - Margin pressure
+  - Long-term AI potential
+
+---
+
+### Reliance Industries (RELIANCE.NS)
+
+- **Recommendation:** INVEST
+- **Confidence:** 8/10
+- **Highlights:**
+  - Diversified business model
+  - Telecom and retail growth
+  - Strong long-term outlook
 
 ## Future Improvements
 
@@ -118,10 +174,20 @@ The system works universally for global equities. Examples:
 
 ## AI Usage
 
-AI was heavily utilized throughout the development of AlphaResearch. 
-- DeepMind's Antigravity AI assistant paired with me to structure the codebase, debug Next.js routing, and implement the real-time SSE streaming architecture.
-- LangGraph orchestrates the underlying workflow, controlling state transitions securely.
-- LLMs (Gemini, OpenAI) act purely as analytical engines, generating the investment analysis safely within strict prompting bounds.
+- AI was used extensively throughout the development of AlphaResearch, as required by the assignment. AI assistants (primarily ChatGPT and Claude) were used to accelerate development, debug Next.js issues, refine LangGraph workflows, improve prompt engineering, and assist with documentation and code reviews.
+- The application itself is powered by LangGraph, which orchestrates the complete agent workflow, including ticker resolution, financial data retrieval, news aggregation, report generation, and investment decisioning.
+- The research pipeline uses multiple LLM providers with automatic fallback for reliability. Google Gemini serves as the primary model, with OpenAI and Hugging Face acting as fallback providers to ensure uninterrupted report generation when rate limits or API failures occur.
+- To improve factual accuracy, the analysis is grounded exclusively in retrieved financial data from Yahoo Finance and recent news articles. The report generation prompt explicitly restricts the model to the supplied context, reducing hallucinations and ensuring that investment recommendations are based only on the available evidence.
+- While AI significantly accelerated development and implementation, all architectural decisions, system integration, feature selection, testing, debugging, and final validation were performed by the developer.
+
+## AI Development Logs
+
+As required by the assignment, this repository includes a sanitized transcript of the AI-assisted development process used while building AlphaResearch.
+
+**Included File:**
+- `docs/AI_CHAT_TRANSCRIPT.jsonl`
+
+The transcript documents AI-assisted development, including brainstorming, implementation, debugging, prompt refinement, and architectural discussions. All API keys, credentials, and other sensitive information have been removed or replaced with placeholders before inclusion.
 
 ## Project Structure
 
@@ -142,6 +208,3 @@ AI was heavily utilized throughout the development of AlphaResearch.
 └── README.md
 ```
 
-## License
-
-MIT License
