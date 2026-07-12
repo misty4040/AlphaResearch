@@ -174,11 +174,11 @@ TAVILY_API_KEY=your_tavily_api_key
 
 ## AI Usage
 
-- AI was used extensively throughout the development of AlphaResearch, as required by the assignment. AI assistants (primarily ChatGPT and Claude) were used to accelerate development, debug Next.js issues, refine LangGraph workflows, improve prompt engineering, and assist with documentation and code reviews.
-- The application itself is powered by LangGraph, which orchestrates the complete agent workflow, including ticker resolution, financial data retrieval, news aggregation, report generation, and investment decisioning.
-- The research pipeline uses multiple LLM providers with automatic fallback for reliability. Google Gemini serves as the primary model, with OpenAI and Hugging Face acting as fallback providers to ensure uninterrupted report generation when rate limits or API failures occur.
-- To improve factual accuracy, the analysis is grounded exclusively in retrieved financial data from Yahoo Finance and recent news articles. The report generation prompt explicitly restricts the model to the supplied context, reducing hallucinations and ensuring that investment recommendations are based only on the available evidence.
-- While AI significantly accelerated development and implementation, all architectural decisions, system integration, feature selection, testing, debugging, and final validation were performed by the developer.
+- AI assistants (primarily ChatGPT and Claude) were used throughout development to accelerate implementation, debug Next.js issues, refine LangGraph workflows, improve prompt engineering, and assist with documentation.
+- LangGraph orchestrates the end-to-end agent workflow, including ticker resolution, financial data retrieval, news aggregation, report generation, and investment decision-making.
+- The application uses multiple LLM providers with automatic fallback. Google Gemini serves as the primary model, while OpenAI and Hugging Face are used as fallback providers to ensure reliability during rate limits or API failures.
+- Investment analysis is grounded in retrieved financial data and recent news, reducing hallucinations and improving the factual accuracy of generated reports.
+- All architectural decisions, system integration, testing, debugging, and final validation were performed by the developer.
 
 ## AI Development Logs
 
